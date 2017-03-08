@@ -45,7 +45,7 @@ The version number is the version of Hobson you are using, or the version you wa
         </cmd>
     </task>
 
-When a <step> runs a <task>, Hobson insures that filesets named ${input} and ${output} are defined for the <task>. These can be set explicitly, for example:
+When a &lt;step&gt; runs a &lt;task&gt;, Hobson insures that filesets named ${input} and ${output} are defined for the &lt;task&gt;. These can be set explicitly, for example:
 
     <run task="javac" input="${src}"/>
 
@@ -63,7 +63,7 @@ Syntax for property files will be similar to Java property files, but simpler. E
 
 Unlike in Java, the file encoding is always UTF-8, the key can't contain any ASCII whitespace or punctuation except period and underscore, the equal sign or colon is required, and leading and trailing whitespace is ignored. The backslash has no special meaning (thus no \u Unicode or other escape sequences.) In expressions, ${key} will be either a single string or a list of strings, depending on whether an equal sign or colon was used. For example:
 
-    javac=C:\windows\system32\javac.exe
+    javac=C:\Program Files\Java\jdk1.8.0\bin\javac.exe
     javac.options:-g -Xlint
 
 #### Expressions
@@ -116,17 +116,17 @@ For filesets defined with a pattern, the base directory is the portion of the pa
 
 #### Expression evaluation
 
-Treatment of single- and multi-valued strings and fileset components varies depending on the enclosing XML element in the build file. The <cmd> element turns multi-valued expressions into separate arguments, and turns empty lists into the absence of arguments. The <opt> element contributes nothing to the enclosing command if any expression within it was empty, and the <path> element concatenates multi-valued expressions using ${:} as a separator. For example, the "javac" task defined above would run this command:
+Treatment of single- and multi-valued strings and fileset components varies depending on the enclosing XML element in the build file. The &lt;cmd&gt; element turns multi-valued expressions into separate arguments, and turns empty lists into the absence of arguments. The &lt;opt&gt; element contributes nothing to the enclosing command if any expression within it was empty, and the &lt;path&gt; element concatenates multi-valued expressions using ${:} as a separator. For example, the "javac" task defined above would run this command:
 
-    C:\windows\system32\javac.exe -g -Xlint -d bin -sourcepath src src/com/example/hello.java
+    C:\Program Files\Java\jdk1.8.0\bin\javac.exe -g -Xlint -d bin -sourcepath src src/com/example/hello.java
 
-Unlike Make, Hobson will not submit this command to the shell or command line interpreter. This means filenames containing spaces do not need to be quoted, and quote characters do not need to be escaped. More subtly, it means parsing of the space-separated arguments within <cmd> occurs before expression evaluation, and Hobson determines the argument array it will pass to the invoked process.
+Unlike Make, Hobson will not submit this command to the shell or command line interpreter. This means filenames containing spaces do not need to be quoted, and quote characters do not need to be escaped. More subtly, parsing of the space-separated arguments within &lt;cmd&gt; occurs before expression evaluation, and Hobson determines the argument array it will pass to the invoked process.
 
 #### Explicit and implicit loops
 
-In the examples above, ${src} is a fileset defined by a pattern that matches only one file, src/com/example/hello.java. If there was more than one file in the fileset, then ${src.filename} would have multiple values, and as described above the <cmd> element pass those values as separate arguments. Since ${src.dir} is an attribute of the fileset itself, it remains a single-valued string.
+In the examples above, ${src} is a fileset defined by a pattern that matches only one file, src/com/example/hello.java. If there was more than one file in the fileset, then ${src.filename} would have multiple values, and as described above the &lt;cmd&gt; element pass those values as separate arguments. Since ${src.dir} is an attribute of the fileset itself, it remains a single-valued string.
 
-However, if ${f} is a multi-fileset, then ${f.dir} is a multi-string. For example:
+However, if ${f} is a multi-fileset, then ${f.dir} is a list of strings. For example:
 
 
     <target name="bin1" pattern="bin1/**/*.class"/>
@@ -135,7 +135,7 @@ However, if ${f} is a multi-fileset, then ${f.dir} is a multi-string. For exampl
         <run task="jar"/>
     </step>
 
-Within the jar task, ${input} is a multi-fileset equivalent to ${bin1,bin2}, so the jar command can be defined as:
+Within the jar task, ${input} is a multi-fileset equivalent to ${bin1,bin2}. The jar command uses a for-each loop to create a -C argument for each one:
 
     <task name="jar">
         <cmd>${jar} cf ${output.filename} 
@@ -143,9 +143,9 @@ Within the jar task, ${input} is a multi-fileset equivalent to ${bin1,bin2}, so 
         </cmd>
     </task>
 
-The <arg> is explicitly repeated for each fileset in the input, and within the <arg> there is an implicit loop around the relative filename.
+The &lt;arg&gt; is explicitly repeated for each fileset in the input, and within the &lt;arg&gt; there is an implicit loop around the relative filename.
 
-The Java tools support the use of argument files to avoid exceeding limits on command line arguments. The <argfile> element creates such a file and makes its name available as ${argfile}.
+The Java tools support the use of argument files to avoid exceeding limits on command line arguments. The &lt;argfile&gt; element creates such a file and makes its name available as ${argfile}.
 
     <task name="jar">
         <argfile>
@@ -156,3 +156,4 @@ The Java tools support the use of argument files to avoid exceeding limits on co
         </cmd>
     </task>
 
+A similar &lt;tmpfile&gt; element creates temporary files without the syntactic particulars of a Java tooling argument file.
